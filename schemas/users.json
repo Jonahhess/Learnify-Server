@@ -1,0 +1,93 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": ["name", "email", "password", "timestamps"],
+    "properties": {
+      "_id": { "bsonType": "objectId" },
+      "name": {
+        "bsonType": "string",
+        "minLength": 3,
+        "maxLength": 45
+      },
+      "email": {
+        "bsonType": "string",
+        "pattern": "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+      },
+      "password": {
+        "bsonType": "string",
+        "minLength": 6,
+        "maxLength": 45
+      },
+      "myCurrentCourses": {
+        "bsonType": "array",
+        "maxItems": 5,
+        "items": {
+          "bsonType": "object",
+          "required": ["courseId", "title"],
+          "properties": {
+            "courseId": { "bsonType": "objectId" },
+            "title": {
+              "bsonType": "string",
+              "minLength": 3,
+              "maxLength": 45
+            }
+          }
+        }
+      },
+      "myCurrentCoursewares": {
+        "bsonType": "array",
+        "maxItems": 5,
+        "items": {
+          "bsonType": "object",
+          "required": ["courseId", "title"],
+          "properties": {
+            "courseId": { "bsonType": "objectId" },
+            "title": {
+              "bsonType": "string",
+              "minLength": 3,
+              "maxLength": 45
+            }
+          }
+        }
+      },
+      "myCompletedCourses": {
+        "bsonType": "array",
+        "items": {
+          "bsonType": "object",
+          "required": ["courseId", "title"],
+          "properties": {
+            "courseId": { "bsonType": "objectId" },
+            "title": {
+              "bsonType": "string",
+              "minLength": 3,
+              "maxLength": 45
+            }
+          }
+        }
+      },
+      "myCompletedCoursewares": {
+        "bsonType": "array",
+        "items": {
+          "bsonType": "object",
+          "required": ["courseId", "title"],
+          "properties": {
+            "courseId": { "bsonType": "objectId" },
+            "title": {
+              "bsonType": "string",
+              "minLength": 3,
+              "maxLength": 45
+            }
+          }
+        }
+      },
+      "timestamps": {
+        "bsonType": "object",
+        "required": ["createdAt", "updatedAt"],
+        "properties": {
+          "createdAt": { "bsonType": "date" },
+          "updatedAt": { "bsonType": "date" }
+        }
+      }
+    }
+  }
+}
