@@ -2,14 +2,16 @@
   "bsonType": "object",
   "oneOf": [
     {
-      "required": ["_id", "title"],
+      "additionalProperties": false,
+      "required": ["title"],
       "properties": {
         "_id": { "bsonType": "objectId" },
         "title": { "bsonType": "string" }
       }
     },
     {
-      "required": ["_id", "title", "text"],
+      "additionalProperties": false,
+      "required": ["title", "text", "quiz"],
       "properties": {
         "_id": { "bsonType": "objectId" },
         "title": {
@@ -24,14 +26,45 @@
         },
         "quiz": {
           "bsonType": "array",
-          "items": { "bsonType": "object" }
-        },
-        "timestamps": {
-          "bsonType": "object",
-          "required": ["createdAt", "updatedAt"],
-          "properties": {
-            "createdAt": { "bsonType": "date" },
-            "updatedAt": { "bsonType": "date" }
+          "maxItems": 20,
+          "items": {
+            "bsonType": "object",
+            "additionalProperties": false,
+            "required": [
+              "coursewareId",
+              "text",
+              "correctAnswer",
+              "incorrectAnswers"
+            ],
+            "properties": {
+              "_id": { "bsonType": "objectId" },
+              "coursewareId": { "bsonType": "objectId" },
+              "text": {
+                "bsonType": "string",
+                "minLength": 3,
+                "maxLength": 100
+              },
+              "correctAnswer": {
+                "bsonType": "string"
+              },
+              "incorrectAnswers": {
+                "bsonType": "array",
+                "minItems": 1,
+                "maxItems": 5,
+                "items": { "bsonType": "string" }
+              },
+              "createdAt": { "bsonType": "date" },
+              "updatedAt": { "bsonType": "date" },
+              "stats": {
+                "bsonType": "object",
+                "properties": {
+                  "likes": { "bsonType": "int" },
+                  "dislikes": { "bsonType": "int" },
+                  "views": { "bsonType": "int" }
+                }
+              },
+              "createdBy": { "bsonType": "objectId" }
+            }
           }
         },
         "stats": {
@@ -42,7 +75,10 @@
             "views": { "bsonType": "int" }
           }
         },
-        "createdBy": { "bsonType": "objectId" }
+        "createdBy": { "bsonType": "objectId" },
+        "createdAt": { "bsonType": "date" },
+        "updatedAt": { "bsonType": "date" },
+        "__v": { "bsonType": "int" }
       }
     }
   ]
