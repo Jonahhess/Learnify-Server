@@ -1,0 +1,49 @@
+{
+  "bsonType": "object",
+  "oneOf": [
+    {
+      "required": ["_id", "title"],
+      "properties": {
+        "_id": { "bsonType": "objectId" },
+        "title": { "bsonType": "string" }
+      }
+    },
+    {
+      "required": ["_id", "title", "text"],
+      "properties": {
+        "_id": { "bsonType": "objectId" },
+        "title": {
+          "bsonType": "string",
+          "minLength": 3,
+          "maxLength": 45
+        },
+        "text": {
+          "bsonType": "string",
+          "minLength": 100,
+          "maxLength": 5000
+        },
+        "quiz": {
+          "bsonType": "array",
+          "items": { "bsonType": "object" }
+        },
+        "timestamps": {
+          "bsonType": "object",
+          "required": ["createdAt", "updatedAt"],
+          "properties": {
+            "createdAt": { "bsonType": "date" },
+            "updatedAt": { "bsonType": "date" }
+          }
+        },
+        "stats": {
+          "bsonType": "object",
+          "properties": {
+            "likes": { "bsonType": "int" },
+            "dislikes": { "bsonType": "int" },
+            "views": { "bsonType": "int" }
+          }
+        },
+        "createdBy": { "bsonType": "objectId" }
+      }
+    }
+  ]
+}
