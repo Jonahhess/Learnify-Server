@@ -1,48 +1,34 @@
 {
-  "$jsonSchema": {
-    "bsonType": "object",
-    "additionalProperties": false,
-    "required": [
-      "_id",
-      "coursewareId",
-      "text",
-      "choices",
-      "answerIndex",
-      "timestamps"
-    ],
-    "properties": {
-      "_id": { "bsonType": "objectId" },
-      "coursewareId": { "bsonType": "objectId" },
-      "text": {
-        "bsonType": "string",
-        "minLength": 3,
-        "maxLength": 100
-      },
-      "choices": {
-        "bsonType": "array",
-        "minItems": 2,
-        "maxItems": 5,
-        "items": { "bsonType": "string" }
-      },
-      "answerIndex": { "bsonType": "int" },
-      "timestamps": {
-        "bsonType": "object",
-        "additionalProperties": false,
-        "required": ["createdAt", "updatedAt"],
-        "properties": {
-          "createdAt: { bsonType": "date"
-        },
-        "updatedAt: { bsonType": "date"
+  "bsonType": "object",
+  "additionalProperties": false,
+  "required": ["coursewareId", "text", "correctAnswer", "incorrectAnswers"],
+  "properties": {
+    "_id": { "bsonType": "objectId" },
+    "coursewareId": { "bsonType": "objectId" },
+    "text": {
+      "bsonType": "string",
+      "minLength": 3,
+      "maxLength": 100
+    },
+    "correctAnswer": {
+      "bsonType": "string"
+    },
+    "incorrectAnswers": {
+      "bsonType": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "bsonType": "string" }
+    },
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" },
+    "stats": {
+      "bsonType": "object",
+      "properties": {
+        "likes": { "bsonType": "int" },
+        "dislikes": { "bsonType": "int" },
+        "views": { "bsonType": "int" }
       }
-    }
-  },
-  "stats": {
-    "bsonType": "object",
-    "properties": {
-      "likes": { "bsonType": "int" },
-      "dislikes": { "bsonType": "int" },
-      "views": { "bsonType": "int" }
-    }
-  },
-  "createdBy": { "bsonType": "objectId" }
+    },
+    "createdBy": { "bsonType": "objectId" }
+  }
 }
