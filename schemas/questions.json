@@ -1,6 +1,7 @@
 {
   "$jsonSchema": {
     "bsonType": "object",
+    "additionalProperties": false,
     "required": [
       "_id",
       "coursewareId",
@@ -26,6 +27,7 @@
       "answerIndex": { "bsonType": "int" },
       "timestamps": {
         "bsonType": "object",
+        "additionalProperties": false,
         "required": ["createdAt", "updatedAt"],
         "properties": {
           "createdAt: { bsonType": "date"

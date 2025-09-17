@@ -1,6 +1,7 @@
 {
   "$jsonSchema": {
     "bsonType": "object",
+    "additionalProperties": false,
     "required": ["name", "email", "password", "timestamps"],
     "properties": {
       "_id": { "bsonType": "objectId" },
@@ -23,6 +24,7 @@
         "maxItems": 5,
         "items": {
           "bsonType": "object",
+          "additionalProperties": false,
           "required": ["courseId", "title"],
           "properties": {
             "courseId": { "bsonType": "objectId" },
@@ -39,6 +41,7 @@
         "maxItems": 5,
         "items": {
           "bsonType": "object",
+          "additionalProperties": false,
           "required": ["courseId", "title"],
           "properties": {
             "courseId": { "bsonType": "objectId" },
@@ -54,6 +57,7 @@
         "bsonType": "array",
         "items": {
           "bsonType": "object",
+          "additionalProperties": false,
           "required": ["courseId", "title"],
           "properties": {
             "courseId": { "bsonType": "objectId" },
@@ -69,6 +73,7 @@
         "bsonType": "array",
         "items": {
           "bsonType": "object",
+          "additionalProperties": false,
           "required": ["courseId", "title"],
           "properties": {
             "courseId": { "bsonType": "objectId" },
@@ -82,6 +87,7 @@
       },
       "timestamps": {
         "bsonType": "object",
+        "additionalProperties": false,
         "required": ["createdAt", "updatedAt"],
         "properties": {
           "createdAt": { "bsonType": "date" },
