@@ -1,119 +1,117 @@
 {
-  "$jsonSchema": {
-    "bsonType": "object",
-    "additionalProperties": false,
-    "required": ["title", "coursewares", "timestamps"],
-    "properties": {
-      "_id": { "bsonType": "objectId" },
-      "title": { "bsonType": "string" },
-      "coursewares": {
-        "bsonType": "array",
-        "items": {
-          "bsonType": "object",
-          "oneOf": [
-            {
-              "additionalProperties": false,
-              "required": ["_id", "title"],
-              "properties": {
-                "_id": { "bsonType": "objectId" },
-                "title": { "bsonType": "string" }
-              }
-            },
-            {
-              "additionalProperties": false,
-              "required": ["_id", "title", "text"],
-              "properties": {
-                "_id": { "bsonType": "objectId" },
-                "title": {
-                  "bsonType": "string",
-                  "minLength": 3,
-                  "maxLength": 45
-                },
-                "text": {
-                  "bsonType": "string",
-                  "minLength": 100,
-                  "maxLength": 5000
-                },
-                "quiz": {
-                  "bsonType": "array",
-                  "items": {
-                    "bsonType": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "_id",
-                      "coursewareId",
-                      "text",
-                      "choices",
-                      "answerIndex"
-                    ],
-                    "properties": {
-                      "_id": { "bsonType": "objectId" },
-                      "coursewareId": { "bsonType": "objectId" },
-                      "text": {
-                        "bsonType": "string",
-                        "minLength": 3,
-                        "maxLength": 100
-                      },
-                      "choices": {
-                        "bsonType": "array",
-                        "minItems": 2,
-                        "maxItems": 5,
-                        "items": { "bsonType": "string" }
-                      },
-                      "answerIndex": { "bsonType": "int" },
-                      "timestamps": {
-                        "bsonType": "object",
-                        "additionalProperties": false,
-                        "required": ["createdAt", "updatedAt"],
-                        "properties": {
-                          "createdAt": { "bsonType": "date" },
-                          "updatedAt": { "bsonType": "date" }
-                        }
-                      },
-                      "stats": {
-                        "bsonType": "object",
-                        "properties": {
-                          "likes": { "bsonType": "int" },
-                          "dislikes": { "bsonType": "int" },
-                          "views": { "bsonType": "int" }
-                        }
-                      },
-                      "createdBy": { "bsonType": "objectId" }
-                    }
-                  }
-                },
-                "timestamps": {
+  "bsonType": "object",
+  "additionalProperties": false,
+  "required": ["title", "coursewares"],
+  "properties": {
+    "_id": { "bsonType": "objectId" },
+    "title": { "bsonType": "string" },
+    "coursewares": {
+      "bsonType": "array",
+      "maxItems": 100,
+      "items": {
+        "bsonType": "object",
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "required": ["title"],
+            "properties": {
+              "_id": { "bsonType": "objectId" },
+              "title": { "bsonType": "string" }
+            }
+          },
+          {
+            "additionalProperties": false,
+            "required": ["title", "text", "quiz"],
+            "properties": {
+              "_id": { "bsonType": "objectId" },
+              "title": {
+                "bsonType": "string",
+                "minLength": 3,
+                "maxLength": 45
+              },
+              "text": {
+                "bsonType": "string",
+                "minLength": 100,
+                "maxLength": 5000
+              },
+              "quiz": {
+                "bsonType": "array",
+                "items": {
                   "bsonType": "object",
                   "additionalProperties": false,
-                  "required": ["createdAt", "updatedAt"],
+                  "required": [
+                    "coursewareId",
+                    "text",
+                    "choices",
+                    "answerIndex"
+                  ],
                   "properties": {
-                    "createdAt": { "bsonType": "date" },
-                    "updatedAt": { "bsonType": "date" }
+                    "_id": { "bsonType": "objectId" },
+                    "coursewareId": { "bsonType": "objectId" },
+                    "text": {
+                      "bsonType": "string",
+                      "minLength": 3,
+                      "maxLength": 100
+                    },
+                    "choices": {
+                      "bsonType": "array",
+                      "minItems": 2,
+                      "maxItems": 5,
+                      "items": { "bsonType": "string" }
+                    },
+                    "answerIndex": { "bsonType": "int" },
+                    "timestamps": {
+                      "bsonType": "object",
+                      "additionalProperties": false,
+                      "required": ["createdAt", "updatedAt"],
+                      "properties": {
+                        "createdAt": { "bsonType": "date" },
+                        "updatedAt": { "bsonType": "date" }
+                      }
+                    },
+                    "stats": {
+                      "bsonType": "object",
+                      "properties": {
+                        "likes": { "bsonType": "int" },
+                        "dislikes": { "bsonType": "int" },
+                        "views": { "bsonType": "int" }
+                      }
+                    },
+                    "createdBy": { "bsonType": "objectId" }
                   }
-                },
-                "stats": {
-                  "bsonType": "object",
-                  "properties": {
-                    "likes": { "bsonType": "int" },
-                    "dislikes": { "bsonType": "int" },
-                    "views": { "bsonType": "int" }
-                  }
-                },
-                "createdBy": { "bsonType": "objectId" }
-              }
+                }
+              },
+              "timestamps": {
+                "bsonType": "object",
+                "additionalProperties": false,
+                "required": ["createdAt", "updatedAt"],
+                "properties": {
+                  "createdAt": { "bsonType": "date" },
+                  "updatedAt": { "bsonType": "date" }
+                }
+              },
+              "stats": {
+                "bsonType": "object",
+                "properties": {
+                  "likes": { "bsonType": "int" },
+                  "dislikes": { "bsonType": "int" },
+                  "views": { "bsonType": "int" }
+                }
+              },
+              "createdBy": { "bsonType": "objectId" }
             }
-          ]
-        }
-      },
-      "timestamps": {
-        "bsonType": "object",
-        "additionalProperties": false,
-        "required": ["createdAt", "updatedAt"],
-        "properties": {
-          "createdAt: { bsonType": "date"
-        },
-        "updatedAt: { bsonType": "date"
+          }
+        ]
       }
+    },
+    "timestamps": {
+      "bsonType": "object",
+      "additionalProperties": false,
+      "required": ["createdAt", "updatedAt"],
+      "properties": {
+        "createdAt: { bsonType": "date"
+      },
+      "updatedAt: { bsonType": "date"
     }
   },
   "stats": {
