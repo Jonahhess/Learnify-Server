@@ -10,7 +10,9 @@
     "myCompletedCourses",
     "myCompletedCoursewares",
     "myReviewCards",
-    "timestamps"
+    "createdAt",
+    "updatedAt",
+    "__v"
   ],
   "properties": {
     "_id": { "bsonType": "objectId" },
@@ -26,7 +28,7 @@
     "password": {
       "bsonType": "string",
       "minLength": 6,
-      "maxLength": 45
+      "maxLength": 100
     },
     "myCurrentCourses": {
       "bsonType": "array",
@@ -100,14 +102,8 @@
         "bsonType": "objectId"
       }
     },
-    "timestamps": {
-      "bsonType": "object",
-      "additionalProperties": false,
-      "required": ["createdAt", "updatedAt"],
-      "properties": {
-        "createdAt": { "bsonType": "date" },
-        "updatedAt": { "bsonType": "date" }
-      }
-    }
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" },
+    "__v": { "bsonType": "int" }
   }
 }
