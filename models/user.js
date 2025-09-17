@@ -3,10 +3,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
-  username: {
+  name: {
     type: String,
     required: true,
-    unique: true,
   },
   email: {
     type: String,
@@ -17,7 +16,27 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-});
+  myCurrentCourses: [{
+    courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+    title: String
+  }],
+  myCurrentCoursewares: [{
+    coursewareId: { type: mongoose.Schema.Types.ObjectId, ref: 'Courseware' },
+    title: String
+  }],
+  myCompletedCourses: [{
+    courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+    title: String
+  }],
+  myCompletedCoursewares: [{
+    coursewareId: { type: mongoose.Schema.Types.ObjectId, ref: 'Courseware' },
+    title: String
+  }],
+  myReviewCards: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ReviewCard'
+  }],
+}, { timestamps: true });
 
 // Hash password before saving
 UserSchema.pre('save', async function (next) {
