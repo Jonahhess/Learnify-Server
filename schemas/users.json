@@ -1,98 +1,112 @@
 {
-  "$jsonSchema": {
-    "bsonType": "object",
-    "additionalProperties": false,
-    "required": ["name", "email", "password", "timestamps"],
-    "properties": {
-      "_id": { "bsonType": "objectId" },
-      "name": {
-        "bsonType": "string",
-        "minLength": 3,
-        "maxLength": 45
-      },
-      "email": {
-        "bsonType": "string",
-        "pattern": "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
-      },
-      "password": {
-        "bsonType": "string",
-        "minLength": 6,
-        "maxLength": 45
-      },
-      "myCurrentCourses": {
-        "bsonType": "array",
-        "maxItems": 5,
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "required": ["courseId", "title"],
-          "properties": {
-            "courseId": { "bsonType": "objectId" },
-            "title": {
-              "bsonType": "string",
-              "minLength": 3,
-              "maxLength": 45
-            }
-          }
-        }
-      },
-      "myCurrentCoursewares": {
-        "bsonType": "array",
-        "maxItems": 5,
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "required": ["courseId", "title"],
-          "properties": {
-            "courseId": { "bsonType": "objectId" },
-            "title": {
-              "bsonType": "string",
-              "minLength": 3,
-              "maxLength": 45
-            }
-          }
-        }
-      },
-      "myCompletedCourses": {
-        "bsonType": "array",
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "required": ["courseId", "title"],
-          "properties": {
-            "courseId": { "bsonType": "objectId" },
-            "title": {
-              "bsonType": "string",
-              "minLength": 3,
-              "maxLength": 45
-            }
-          }
-        }
-      },
-      "myCompletedCoursewares": {
-        "bsonType": "array",
-        "items": {
-          "bsonType": "object",
-          "additionalProperties": false,
-          "required": ["courseId", "title"],
-          "properties": {
-            "courseId": { "bsonType": "objectId" },
-            "title": {
-              "bsonType": "string",
-              "minLength": 3,
-              "maxLength": 45
-            }
-          }
-        }
-      },
-      "timestamps": {
+  "bsonType": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "email",
+    "password",
+    "myCurrentCourses",
+    "myCurrentCoursewares",
+    "myCompletedCourses",
+    "myCompletedCoursewares",
+    "myReviewCards",
+    "timestamps"
+  ],
+  "properties": {
+    "_id": { "bsonType": "objectId" },
+    "name": {
+      "bsonType": "string",
+      "minLength": 3,
+      "maxLength": 45
+    },
+    "email": {
+      "bsonType": "string",
+      "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+    },
+    "password": {
+      "bsonType": "string",
+      "minLength": 6,
+      "maxLength": 45
+    },
+    "myCurrentCourses": {
+      "bsonType": "array",
+      "maxItems": 5,
+      "items": {
         "bsonType": "object",
         "additionalProperties": false,
-        "required": ["createdAt", "updatedAt"],
+        "required": ["courseId", "title"],
         "properties": {
-          "createdAt": { "bsonType": "date" },
-          "updatedAt": { "bsonType": "date" }
+          "courseId": { "bsonType": "objectId" },
+          "title": {
+            "bsonType": "string",
+            "minLength": 3,
+            "maxLength": 45
+          }
         }
+      }
+    },
+    "myCurrentCoursewares": {
+      "bsonType": "array",
+      "maxItems": 5,
+      "items": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "required": ["coursewareId", "title"],
+        "properties": {
+          "coursewareId": { "bsonType": "objectId" },
+          "title": {
+            "bsonType": "string",
+            "minLength": 3,
+            "maxLength": 45
+          }
+        }
+      }
+    },
+    "myCompletedCourses": {
+      "bsonType": "array",
+      "items": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "required": ["courseId", "title"],
+        "properties": {
+          "courseId": { "bsonType": "objectId" },
+          "title": {
+            "bsonType": "string",
+            "minLength": 3,
+            "maxLength": 45
+          }
+        }
+      }
+    },
+    "myCompletedCoursewares": {
+      "bsonType": "array",
+      "items": {
+        "bsonType": "object",
+        "additionalProperties": false,
+        "required": ["coursewareId", "title"],
+        "properties": {
+          "coursewareId": { "bsonType": "objectId" },
+          "title": {
+            "bsonType": "string",
+            "minLength": 3,
+            "maxLength": 45
+          }
+        }
+      }
+    },
+    "myReviewCards": {
+      "bsonType": "array",
+      "items": {
+        "bsonType": "objectId"
+      }
+    },
+    "timestamps": {
+      "bsonType": "object",
+      "additionalProperties": false,
+      "required": ["createdAt", "updatedAt"],
+      "properties": {
+        "createdAt": { "bsonType": "date" },
+        "updatedAt": { "bsonType": "date" }
       }
     }
   }
