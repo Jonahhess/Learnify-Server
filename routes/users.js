@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const validateNewUser = require('../middleware/validateNewUser');
 const { 
   createUser, 
   loginUser,
@@ -10,8 +11,9 @@ const {
   deleteUser 
 } = require('../controllers/userController');
 
+
 // Create a new user
-router.post('/', createUser);
+router.post('/', validateNewUser, createUser);
 
 // Login a user
 router.post('/login', loginUser);
