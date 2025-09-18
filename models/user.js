@@ -1,46 +1,81 @@
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    myCurrentCourses: {
+      type: [
+        {
+          courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+          title: String,
+        },
+      ],
+      default: [],
+    },
+    myCurrentCoursewares: {
+      type: [
+        {
+          coursewareId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Courseware",
+          },
+          title: String,
+        },
+      ],
+      default: [],
+    },
+    myCompletedCourses: {
+      type: [
+        {
+          courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+          title: String,
+        },
+      ],
+      default: [],
+    },
+    myCompletedCoursewares: {
+      type: [
+        {
+          coursewareId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Courseware",
+          },
+          title: String,
+        },
+      ],
+      default: [],
+    },
+    myReviewCards: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "ReviewCard",
+        },
+      ],
+      default: [],
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  myCurrentCourses: [{
-    courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
-    title: String
-  }],
-  myCurrentCoursewares: [{
-    coursewareId: { type: mongoose.Schema.Types.ObjectId, ref: 'Courseware' },
-    title: String
-  }],
-  myCompletedCourses: [{
-    courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
-    title: String
-  }],
-  myCompletedCoursewares: [{
-    coursewareId: { type: mongoose.Schema.Types.ObjectId, ref: 'Courseware' },
-    title: String
-  }],
-  myReviewCards: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ReviewCard'
-  }],
-}, { timestamps: true });
+  {
+    timestamps: true,
+  }
+);
 
 // Hash password before saving
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
     return next();
   }
   const salt = await bcrypt.genSalt(10);
@@ -53,4 +88,4 @@ UserSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("users", UserSchema);

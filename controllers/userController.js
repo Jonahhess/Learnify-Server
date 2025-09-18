@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 // Create a new user
 exports.createUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    const newUser = new User({ username, email, password });
+    const { name, email, password } = req.body;
+    const newUser = new User({ name, email, password });
     await newUser.save();
 
     const payload = { user: { id: newUser.id } };
@@ -14,7 +14,7 @@ exports.createUser = async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      //secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
       sameSite: 'strict',
       maxAge: 3600000 // 1 hour
     }).status(201).json({ message: "User created successfully" });
