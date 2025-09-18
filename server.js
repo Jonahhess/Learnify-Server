@@ -6,11 +6,13 @@ const limiter = require("./middleware/rateLimiter");
 const apiRoutes = require("./routes/api");
 const { errorHandler } = require("./middleware/errorHandler");
 
+const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(logger);
 app.use(limiter);
 app.use(express.json());
+app.use(cookieParser());
 
 connectDB();
 
