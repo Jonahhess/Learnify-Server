@@ -42,8 +42,8 @@
                   "required": [
                     "coursewareId",
                     "text",
-                    "choices",
-                    "answerIndex"
+                    "correctAnswer",
+                    "incorrectAnswers"
                   ],
                   "properties": {
                     "_id": { "bsonType": "objectId" },
@@ -53,22 +53,17 @@
                       "minLength": 3,
                       "maxLength": 100
                     },
-                    "choices": {
+                    "correctAnswer": {
+                      "bsonType": "string"
+                    },
+                    "incorrectAnswers": {
                       "bsonType": "array",
-                      "minItems": 2,
+                      "minItems": 1,
                       "maxItems": 5,
                       "items": { "bsonType": "string" }
                     },
-                    "answerIndex": { "bsonType": "int" },
-                    "timestamps": {
-                      "bsonType": "object",
-                      "additionalProperties": false,
-                      "required": ["createdAt", "updatedAt"],
-                      "properties": {
-                        "createdAt": { "bsonType": "date" },
-                        "updatedAt": { "bsonType": "date" }
-                      }
-                    },
+                    "createdAt": { "bsonType": "date" },
+                    "updatedAt": { "bsonType": "date" },
                     "stats": {
                       "bsonType": "object",
                       "properties": {
@@ -104,15 +99,8 @@
         ]
       }
     },
-    "timestamps": {
-      "bsonType": "object",
-      "additionalProperties": false,
-      "required": ["createdAt", "updatedAt"],
-      "properties": {
-        "createdAt: { bsonType": "date"
-      },
-      "updatedAt: { bsonType": "date"
-    }
+    "createdAt: { bsonType": "date",
+    "updatedAt: { bsonType": "date"
   },
   "stats": {
     "bsonType": "object",
