@@ -76,15 +76,8 @@
                   }
                 }
               },
-              "timestamps": {
-                "bsonType": "object",
-                "additionalProperties": false,
-                "required": ["createdAt", "updatedAt"],
-                "properties": {
-                  "createdAt": { "bsonType": "date" },
-                  "updatedAt": { "bsonType": "date" }
-                }
-              },
+              "createdAt": { "bsonType": "date" },
+              "updatedAt": { "bsonType": "date" },
               "stats": {
                 "bsonType": "object",
                 "properties": {
@@ -99,15 +92,15 @@
         ]
       }
     },
-    "createdAt: { bsonType": "date",
-    "updatedAt: { bsonType": "date"
-  },
-  "stats": {
-    "bsonType": "object",
-    "properties": {
-      "likes": { "bsonType": "int" },
-      "dislikes": { "bsonType": "int" },
-      "views": { "bsonType": "int" }
+    "createdAt": { "bsonType": "date" },
+    "updatedAt": { "bsonType": "date" },
+    "stats": {
+      "bsonType": "object",
+      "properties": {
+        "likes": { "bsonType": "int" },
+        "dislikes": { "bsonType": "int" },
+        "views": { "bsonType": "int" }
+      }
     }
   }
 }
