@@ -32,4 +32,4 @@ const reviewCardSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('ReviewCard', reviewCardSchema);
+module.exports = mongoose.model('reviewCards', reviewCardSchema);

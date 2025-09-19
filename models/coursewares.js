@@ -42,4 +42,4 @@ const coursewareSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Courseware", coursewareSchema);
+module.exports = mongoose.model("coursewares", coursewareSchema);

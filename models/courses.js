@@ -33,9 +33,26 @@ const courseSchema = new mongoose.Schema(
       type: [String],
     },
   },
-  {
-    timestamps: true,
+  coursewares: [{
+    type: Object,
+    ref: 'Courseware',
+    title: String,
+    required: true
+  }],
+  stats: {
+    likes: {
+      type: Number,
+      default: 0
+    },
+    dislikes: {
+      type: Number,
+      default: 0
+    },
+    views: {
+      type: Number,
+      default: 0
+    }
   }
 );
 
-module.exports = mongoose.model("Course", courseSchema);
+module.exports = mongoose.model('courses', courseSchema);

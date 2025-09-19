@@ -8,8 +8,7 @@ exports.createUser = async (req, res) => {
     const newUser = new User({ name, email, password });
     await newUser.save();
 
-    const payload = { user: { id: newUser.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign(newUser.toObject(), process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -41,8 +40,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const payload = { user: { id: user.id } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign(user.toObject(), process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
