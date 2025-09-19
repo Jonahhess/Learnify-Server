@@ -11,8 +11,11 @@ const coursewareSchema = new mongoose.Schema(
     },
     quiz: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Question",
+        questionId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Question",
+        },
+        title: { type: String, required: true },
       },
     ],
     stats: {
