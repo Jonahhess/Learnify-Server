@@ -34,4 +34,4 @@ const coursewareSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Courseware', coursewareSchema);
+module.exports = mongoose.model('coursewares', coursewareSchema);
