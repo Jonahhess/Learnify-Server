@@ -3,9 +3,11 @@ const router = express.Router();
 
 const userRoutes = require('./users');
 const courseRoutes = require('./courses');
+const coursewareRoutes = require('./coursewares');
 
 router.use('/user', userRoutes);
 router.use('/courses', courseRoutes);
+router.use('/coursewares', coursewareRoutes);
 
 // TODO: Add API routes here
 router.get('/', (req, res) => {

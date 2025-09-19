@@ -6,8 +6,10 @@ const courseSchema = new mongoose.Schema({
     required: true
   },
   coursewares: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Courseware'
+    type: Object,
+    ref: 'Courseware',
+    title: String,
+    required: true
   }],
   stats: {
     likes: {
@@ -27,4 +29,4 @@ const courseSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Course', courseSchema);
+module.exports = mongoose.model('courses', courseSchema);

@@ -3,9 +3,15 @@ const Course = require('../models/courses');
 // Create a new course
 exports.createCourse = async (req, res) => {
   try {
-    const { title, coursewares } = req.body;
+    const { title } = req.body;
+    const coursewares = req.body.coursewares || [];
     const newCourse = new Course({ title, coursewares });
     await newCourse.save();
+
+    // add the course to the user's myCourses array
+    req.user.myCurrentCourses.push({ id: newCourse._id, title: newCourse.title });
+    await req.user.save();
+
     res.status(201).json({ message: "Course created successfully", course: newCourse });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -15,7 +21,8 @@ exports.createCourse = async (req, res) => {
 // Get all courses
 exports.getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find();
+    //limited to 10 results
+    const courses = await Course.find().limit(10);
     res.json(courses);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -38,6 +45,7 @@ exports.updateCourse = async (req, res) => {
   try {
     const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!course) return res.status(404).json({ message: 'Course not found' });
+    // if the update is 
     res.json(course);
   } catch (err) {
     res.status(400).json({ message: err.message });
