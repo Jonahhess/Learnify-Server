@@ -7,7 +7,15 @@ const apiRoutes = require("./routes/api");
 const { errorHandler } = require("./middleware/errorHandler");
 
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use(logger);
 app.use(limiter);
