@@ -51,7 +51,7 @@ exports.loginUser = async (req, res) => {
         sameSite: "strict",
         maxAge: 3600000, // 1 hour
       })
-      .json({ message: "Logged in successfully" });
+      .json({ message: "Logged in successfully", user: user.toObject() });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

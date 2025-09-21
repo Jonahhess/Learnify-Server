@@ -6,12 +6,14 @@ const courseRoutes = require('./courses');
 const coursewareRoutes = require('./coursewares');
 const reviewCardRoutes = require('./reviewCards');
 const questionRoutes = require('./questions');
+const aiRoutes = require('./ai');
 
 router.use('/user', userRoutes);
 router.use('/courses', courseRoutes);
 router.use('/coursewares', coursewareRoutes);
 router.use('/review-cards', reviewCardRoutes);
 router.use('/questions', questionRoutes);
+router.use('/ai', aiRoutes);
 
 // TODO: Add API routes here
 router.get('/', (req, res) => {
