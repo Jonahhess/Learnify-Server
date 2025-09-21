@@ -1,9 +1,15 @@
 const Courseware = require("../models/coursewares");
 
 // Create a new courseware
+const courseware = require("../mock/courseware.json");
+const coursewares = require("../mock/coursewares.json");
+
 exports.createCourseware = async (req, res) => {
   try {
-    const { title, text, quiz } = req.body;
+    // should take from the AI API
+    //mock data for now
+    const { text, quiz } = courseware;
+    const title = coursewares[0];
     const newCourseware = new Courseware({
       title,
       text,
