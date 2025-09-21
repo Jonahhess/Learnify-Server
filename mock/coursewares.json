@@ -1,0 +1,16 @@
+[
+  "Welcome to the Algorithmic Adventure: Why Data Structures & Algorithms Matter!",
+  "The Language of Efficiency: Understanding Big O, Omega, and Theta Notation",
+  "Linear Legends: Arrays, Linked Lists, Stacks, and Queues – Building Blocks of Computation",
+  "Recursion: The Art of Solving Problems by Solving Smaller Versions of Themselves (and why it's sometimes tricky!)",
+  "Sorting Spectacular: Bubble, Insertion, Selection – The Basics; Merge, Quick, Heap – The Masters!",
+  "Tree-mendous Structures: Binary Trees, Binary Search Trees, and Heaps – Organizing Hierarchical Data",
+  "Balancing Act: AVL Trees and Red-Black Trees – Keeping Our Trees Tidy and Efficient",
+  "Hashing Out Solutions: Hash Tables and Collision Resolution – Fast Lookups, Clever Tricks",
+  "Graphing the World: Representations (Adjacency List/Matrix), Traversal (BFS/DFS) – Mapping Connections",
+  "Shortest Paths and Spanning Trees: Dijkstra's, Prim's, Kruskal's – Navigating the Network",
+  "Dynamic Programming: Breaking Down Big Problems into Manageable Subproblems (and remembering the answers!)",
+  "Greedy Algorithms: When Taking the Best Option Now Leads to the Best Overall Solution",
+  "Tackling Tough Problems: An Introduction to NP-Completeness and Approximations (a peek at the hard stuff!)",
+  "From Theory to Practice: Choosing the Right Data Structure and Algorithm for Real-World Challenges"
+]
