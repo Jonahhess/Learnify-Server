@@ -1,27 +1,30 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const auth = require('../middleware/auth');
+const auth = require("../middleware/auth");
 const {
-    createCourseware,
-    getAllCoursewares,
-    getCoursewareById,
-    updateCourseware,
-    deleteCourseware
-} = require('../controllers/coursewaresController');
+  createCourseware,
+  getAllCoursewares,
+  getCoursewareById,
+  updateCourseware,
+  deleteCourseware,
+  submitCourseware,
+} = require("../controllers/coursewaresController");
 
 // Create a new courseware
-router.post('/', auth, createCourseware);
+router.post("/", auth, createCourseware);
 
 // Get all coursewares
-router.get('/', getAllCoursewares);
+router.get("/", getAllCoursewares);
 
 // Get a courseware by ID
-router.get('/:id', getCoursewareById);
+router.get("/:id", getCoursewareById);
 
 // Update a courseware by ID
-router.put('/:id', auth, updateCourseware);
+router.put("/:id", auth, updateCourseware);
+
+router.post("/:id", auth, submitCourseware);
 
 // Delete a courseware by ID
-router.delete('/:id', auth, deleteCourseware);
+router.delete("/:id", auth, deleteCourseware);
 
 module.exports = router;
