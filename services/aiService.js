@@ -70,7 +70,7 @@ async function generateFullCourseByTitle(title) {
   }
 
   const coursewares = await Promise.all(promises);
-  return coursewares;
+  return { outline, coursewares };
 }
 
 module.exports = {
