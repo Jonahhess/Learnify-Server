@@ -1,4 +1,5 @@
 const Courseware = require("../models/coursewares");
+const ReviewCard = require("../models/questions");
 
 // Create a new courseware
 const courseware = require("../mock/courseware.json");
@@ -23,12 +24,10 @@ exports.createCourseware = async (req, res) => {
       title: newCourseware.title,
     });
     await req.user.save();
-    res
-      .status(201)
-      .json({
-        message: "Courseware created successfully",
-        courseware: newCourseware,
-      });
+    res.status(201).json({
+      message: "Courseware created successfully",
+      courseware: newCourseware,
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -67,6 +66,42 @@ exports.updateCourseware = async (req, res) => {
     if (!courseware)
       return res.status(404).json({ message: "Courseware not found" });
     res.json(courseware);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// submit a courseware by ID
+exports.submitCourseware = async (req, res) => {
+  try {
+    const courseware = await Courseware.findOne(req.params.id);
+    if (!courseware)
+      return res.status(404).json({ message: "Courseware not found" });
+
+    const courseId = courseware.courseId;
+    const coursewareId = courseware._id;
+    const quiz = courseware.quiz.map((q) => q.questionId);
+    const userId = req.user.id;
+    const now = new Date();
+    const nextReviewDate = now.setDate(now.getDate() + 1);
+
+    const promises = [];
+    for (const questionId of quiz) {
+      promises.push(
+        ReviewCard.create({
+          questionId,
+          courseId,
+          coursewareId,
+          userId,
+          reviews: 0,
+          successes: 0,
+          nextReviewDate,
+        })
+      );
+    }
+
+    await Promise.all(promises);
+    res.send("submitted courseware successfully");
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
