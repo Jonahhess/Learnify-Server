@@ -45,7 +45,7 @@ exports.generateCourseware = async (req, res) => {
     }
     const all = await Promise.allSettled(promises);
     const quiz = all
-      .filter((p) => p.status === '"fulfilled"')
+      .filter((p) => p.status === "fulfilled")
       .map((f) => f.value);
 
     const newCourseware = await Courseware.create({
