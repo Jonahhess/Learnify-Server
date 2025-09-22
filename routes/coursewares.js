@@ -22,8 +22,6 @@ router.get("/:id", getCoursewareById);
 // Update a courseware by ID
 router.put("/:id", auth, updateCourseware);
 
-router.post("/:id", auth, submitCourseware);
-
 // Delete a courseware by ID
 router.delete("/:id", auth, deleteCourseware);
 

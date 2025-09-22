@@ -22,9 +22,6 @@ router.get("/:id", auth, getReviewCardById);
 // Update a review card by ID
 router.put("/:id", auth, updateReviewCard);
 
-// Patch review card with new information
-router.patch("/:id", auth, calculateNextReviewDate);
-
 // Delete a review card by ID
 router.delete("/:id", auth, deleteReviewCard);
 

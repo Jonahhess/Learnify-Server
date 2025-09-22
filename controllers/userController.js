@@ -1,4 +1,8 @@
 const User = require("../models/user");
+const Course = require("../models/courses");
+const Courseware = require("../models/coursewares");
+const ReviewCard = require("../models/reviewCards");
+
 const jwt = require("jsonwebtoken");
 
 // Create a new user
@@ -89,5 +93,232 @@ exports.deleteUser = async (req, res) => {
     res.json({ message: "User deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+// interacting with the app data
+
+// start a course by ID
+exports.startCourse = async (req, res) => {
+  try {
+    const [user, course] = await Promise.all([
+      User.findById(req.user._id),
+      Course.findById(req.params.id),
+    ]);
+
+    // error handling
+    if (!course) return res.status(404).json({ message: "Course not found" });
+    if (!user)
+      return res
+        .status(500)
+        .json({ message: "user not found. This is awkward" });
+
+    if (user.myCurrentCourses.some((c) => c.courseId === course._id)) {
+      return res.status(400).json({ message: "course already exists!" });
+    }
+    if (user.myCurrentCourses.length >= 5) {
+      return res.status(400).json({ message: "Too many courses" });
+    }
+
+    // assigning course to user
+    const courseId = course._id;
+    const title = course.title;
+    const length = course.coursewares?.length;
+
+    user.myCurrentCourses.push({ courseId, title, length });
+
+    if (length) {
+      const firstCourseware = course.coursewares[0];
+      const coursewareTitle = firstCourseware.title;
+      const coursewareId = irstCourseware.coursewareId;
+
+      user.myCurrentCoursewares.push({
+        courseId,
+        coursewareId,
+        title: coursewareTitle,
+        index: 0,
+      });
+    }
+
+    await user.save();
+
+    res.send("added course successfully");
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// start a courseware by ID
+exports.startCourseware = async (req, res) => {
+  try {
+    const [user, courseware] = await Promise.all([
+      User.findById(req.user._id),
+      Courseware.findById(req.params.id),
+    ]);
+
+    // error handling
+    if (!courseware)
+      return res.status(404).json({ message: "Courseware not found" });
+    if (!user)
+      return res
+        .status(500)
+        .json({ message: "user not found. This is awkward" });
+
+    if (
+      user.myCurrentCoursewares.some((c) => c.coursewareId === courseware._id)
+    ) {
+      return res.status(400).json({ message: "courseware already exists!" });
+    }
+    if (user.myCurrentCoursewares.length >= 15) {
+      return res.status(400).json({ message: "Too many coursewares" });
+    }
+
+    if (
+      !user.myCurrentCourses.some((c) => c.courseId === courseware.courseId)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Cannot start courseware before starting course" });
+    }
+
+    // assigning course to user
+    const courseId = courseware.courseId;
+    const coursewareId = courseware._id;
+    const title = courseware.title;
+    const length = course.coursewares?.length;
+
+    // find index of course if exists
+    const course = await Course.findById(courseId);
+    const coursewares = course?.coursewares;
+    const index = coursewares?.findIndex(
+      (c) => c.coursewareId === req.params.id || c.title === title
+    );
+
+    if (length) {
+      user.myCurrentCoursewares.push({
+        courseId,
+        coursewareId,
+        title,
+        index,
+      });
+    }
+
+    await user.save();
+
+    res.send("added courseware successfully");
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// submit a courseware by ID
+exports.submitCourseware = async (req, res) => {
+  try {
+    const [user, courseware] = await Promise.all([
+      User.findById(req.user._id),
+      Courseware.findById(req.params.id),
+    ]);
+
+    if (!user)
+      return res
+        .status(500)
+        .json({ message: "user not found. This is awkward" });
+    if (!courseware)
+      return res.status(404).json({ message: "Courseware not found" });
+
+    if (
+      !user.myCurrentCoursewares.some((c) => c.coursewareId === req.params.id)
+    ) {
+      res.status(400).json({ message: "courseware not registered for user" });
+    }
+
+    const courseId = courseware.courseId;
+    const coursewareId = courseware._id;
+    const title = courseware.title;
+
+    const quiz = courseware.quiz.map((q) => q.questionId);
+    const userId = req.user.id;
+    const now = new Date();
+    const nextReviewDate = now.setDate(now.getDate() + 1);
+
+    // submit courseware for user
+    user.myCurrentCoursewares = user.myCurrentCoursewares.filter(
+      (c) => c.coursewareId !== coursewareId
+    );
+    user.myCompletedCoursewares.push({ courseId, coursewareId, title });
+
+    const promises = [user.save()];
+    for (const questionId of quiz) {
+      promises.push(
+        ReviewCard.create({
+          questionId,
+          courseId,
+          coursewareId,
+          userId,
+          reviews: 0,
+          successes: 0,
+          nextReviewDate,
+        })
+      );
+    }
+
+    await Promise.all(promises);
+    res.send("submitted courseware successfully");
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// helper fn for review cards
+const performReview = async (reviewCard) => {
+  reviewCard.reviews += 1;
+  reviewCard.successes = req.body.success ? reviewCard.successes + 1 : 0;
+  const add = Math.min(Math.max(reviewCard.successes * 2, 1), 365);
+  const oldReviewDate = new Date(reviewCard.nextReviewDate);
+  const nextReviewDate = oldReviewDate.setDate(oldReviewDate.getDate() + add);
+  reviewCard.nextReviewDate = nextReviewDate;
+  reviewCard.save();
+};
+
+// batch review cards by ID
+exports.batchSubmitReviewCards = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    // error handling
+    if (!user)
+      return res
+        .status(500)
+        .json({ message: "user not found. This is awkward" });
+
+    const myReviewCards = user.myReviewCards;
+    const reviewedCards = req.body;
+
+    if (reviewedCards.length > myReviewCards.length) {
+      return res
+        .status(400)
+        .json({ message: "too many cards reviewed. something is wrong" });
+    }
+
+    // array of relevant cards
+    const reviewCards = await ReviewCard.find({
+      _id: { $in: reviewedCards },
+      userId: req.user._id,
+      nextReviewDate: { $lte: Date.now() },
+    });
+
+    for (const card of reviewCards) {
+      performReview(card);
+    }
+
+    user.myReviewCards = user.myReviewCards.filter((c) =>
+      reviewedCards.includes(c)
+    );
+
+    await user.save();
+
+    res.send("reviewed cards successfully");
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 };
