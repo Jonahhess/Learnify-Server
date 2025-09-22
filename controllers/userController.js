@@ -302,7 +302,7 @@ exports.batchSubmitReviewCards = async (req, res) => {
 
     // array of relevant cards
     const reviewCards = await ReviewCard.find({
-      _id: { $in: reviewedCards },
+      _id: { $in: reviewedCards._id },
       userId: req.user._id,
       nextReviewDate: { $lte: Date.now() },
     });
