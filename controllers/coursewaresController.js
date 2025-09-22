@@ -71,42 +71,6 @@ exports.updateCourseware = async (req, res) => {
   }
 };
 
-// submit a courseware by ID
-exports.submitCourseware = async (req, res) => {
-  try {
-    const courseware = await Courseware.findOne(req.params.id);
-    if (!courseware)
-      return res.status(404).json({ message: "Courseware not found" });
-
-    const courseId = courseware.courseId;
-    const coursewareId = courseware._id;
-    const quiz = courseware.quiz.map((q) => q.questionId);
-    const userId = req.user.id;
-    const now = new Date();
-    const nextReviewDate = now.setDate(now.getDate() + 1);
-
-    const promises = [];
-    for (const questionId of quiz) {
-      promises.push(
-        ReviewCard.create({
-          questionId,
-          courseId,
-          coursewareId,
-          userId,
-          reviews: 0,
-          successes: 0,
-          nextReviewDate,
-        })
-      );
-    }
-
-    await Promise.all(promises);
-    res.send("submitted courseware successfully");
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
-
 // Delete a courseware by ID
 exports.deleteCourseware = async (req, res) => {
   try {
