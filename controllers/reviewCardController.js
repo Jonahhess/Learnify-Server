@@ -75,27 +75,3 @@ exports.deleteReviewCard = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
-// Update a review card by ID
-exports.calculateNextReviewDate = async (req, res) => {
-  try {
-    const reviewCard = await ReviewCard.findOne({
-      _id: req.params.id,
-      userId: req.user.id,
-    });
-    if (!reviewCard)
-      return res.status(404).json({ message: "Review card not found" });
-
-    reviewCard.reviews += 1;
-    reviewCard.successes = req.body.success ? reviewCard.successes + 1 : 0;
-    const add = Math.min(Math.max(reviewCard.successes * 2, 1), 365);
-    const oldReviewDate = new Date(reviewCard.nextReviewDate);
-    const nextReviewDate = oldReviewDate.setDate(oldReviewDate.getDate() + add);
-    reviewCard.nextReviewDate = nextReviewDate;
-    reviewCard.save();
-
-    res.json(reviewCard);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-};
