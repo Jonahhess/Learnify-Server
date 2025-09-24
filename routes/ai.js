@@ -1,15 +1,15 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const {
   generateCourseOutline,
   generateCourseware,
   generateFullCourse,
-} = require('../controllers/aiController');
+} = require("../controllers/aiController");
 
-router.post('/outline', generateCourseOutline);
+router.post("/outline", generateCourseOutline);
 
-router.post('/courseware', generateCourseware);
+router.post("/courseware", generateCourseware);
 
-router.post('/full-course', generateFullCourse);
+router.post("/full-course", generateFullCourse);
 
 module.exports = router;
