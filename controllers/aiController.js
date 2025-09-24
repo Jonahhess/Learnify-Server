@@ -7,6 +7,7 @@ const {
 const Course = require("../models/courses");
 const Courseware = require("../models/coursewares");
 const Question = require("../models/questions");
+const { default: mongoose } = require("mongoose");
 
 exports.generateCourseOutline = async (req, res) => {
   try {
@@ -28,32 +29,60 @@ exports.generateCourseOutline = async (req, res) => {
 exports.generateCourseware = async (req, res) => {
   try {
     const { courseTitle, courseId, title } = req.body;
+
+    const courseToUpdate = await Course.findOne({
+      title: courseTitle,
+      _id: courseId,
+      "coursewares.title": title,
+    });
+
+    if (!courseToUpdate) {
+      throw { message: "course not found" };
+    }
+
     const courseware = await generateCoursewareFromTitle(courseTitle, title);
-    const toJson = JSON.parse(courseware);
-    const { text, quizEntries } = toJson;
+
+    const toJson = JSON.parse(JSON.stringify(courseware));
+    const { text, quiz } = toJson;
 
     const coursewareId = new mongoose.Types.ObjectId();
 
     const promises = [];
-    for (const question of quizEntries) {
+    for (const question of quiz) {
       promises.push(
         Question.create({
           coursewareId,
+          courseId: new mongoose.Types.ObjectId(courseId),
           ...question,
         })
       );
     }
     const all = await Promise.allSettled(promises);
-    const quiz = all
+
+    const quizFiltered = all
       .filter((p) => p.status === "fulfilled")
-      .map((f) => f.value);
+      .map((f) => f.value)
+      .map((q) => {
+        return { questionText: q.questionText, questionId: q._id };
+      });
 
     const newCourseware = await Courseware.create({
       title,
       text,
-      quiz,
-      courseId,
+      quiz: quizFiltered,
+      courseId: new mongoose.Types.ObjectId(courseId),
     });
+
+    const index = courseToUpdate.coursewares.findIndex(
+      (o) => o.title === title
+    );
+
+    if (index < 0 || index > courseToUpdate.coursewares.length) {
+      throw { message: "impossible! index out of bounds!" };
+    }
+
+    courseToUpdate.coursewares[index] = { title, coursewareId };
+    await courseToUpdate.save();
 
     res.json(newCourseware);
   } catch (err) {
