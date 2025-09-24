@@ -130,7 +130,7 @@ exports.startCourse = async (req, res) => {
     if (length) {
       const firstCourseware = course.coursewares[0];
       const coursewareTitle = firstCourseware.title;
-      const coursewareId = irstCourseware.coursewareId;
+      const coursewareId = firstCourseware.coursewareId;
 
       user.myCurrentCoursewares.push({
         courseId,
@@ -229,7 +229,9 @@ exports.submitCourseware = async (req, res) => {
     if (
       !user.myCurrentCoursewares.some((c) => c.coursewareId === req.params.id)
     ) {
-      res.status(400).json({ message: "courseware not registered for user" });
+      return res
+        .status(400)
+        .json({ message: "courseware not registered for user" });
     }
 
     const courseId = courseware.courseId;
