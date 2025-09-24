@@ -11,7 +11,7 @@ const coursewareSchema = new mongoose.Schema(
     },
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Question",
+      ref: "Course",
     },
     quiz: [
       {
