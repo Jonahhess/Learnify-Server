@@ -25,10 +25,11 @@ router.post("/login", loginUser);
 // Add Course to user by Id
 router.post("/course/:id", auth, startCourse);
 
-// Submit Courseware by Id
-router.post("/coursewares/:id", auth, startCourseware);
-
+// Submit Courseware by id
 router.post("/coursewares/:id/submit", auth, submitCourseware);
+
+// Start Courseware by Id
+router.post("/coursewares/:id", auth, startCourseware);
 
 // Submit Review Cards
 router.post("/review", auth, batchSubmitReviewCards);
