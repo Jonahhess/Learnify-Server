@@ -28,11 +28,13 @@ const UserSchema = new mongoose.Schema(
     myCurrentCoursewares: {
       type: [
         {
+          courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
           coursewareId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Courseware",
           },
           title: String,
+          index: Number,
         },
       ],
       default: [],
