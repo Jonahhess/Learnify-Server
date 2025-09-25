@@ -14,8 +14,10 @@ exports.generateCourseOutline = async (req, res) => {
     const { title } = req.body;
     const outline = await generateCourseOutlineFromTitle(title);
     const toJson = JSON.parse(outline);
-    const coursewares = toJson.map((title) => {
-      title;
+    const coursewares = toJson.map((courseTitle) => {
+      return {
+        title: courseTitle,
+      };
     });
 
     const newCourse = await Course.create({ title, coursewares });

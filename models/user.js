@@ -28,11 +28,13 @@ const UserSchema = new mongoose.Schema(
     myCurrentCoursewares: {
       type: [
         {
+          courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
           coursewareId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Courseware",
           },
           title: String,
+          index: Number,
         },
       ],
       default: [],
@@ -54,6 +56,8 @@ const UserSchema = new mongoose.Schema(
             ref: "Courseware",
           },
           title: String,
+          courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+          index: Number,
         },
       ],
       default: [],
@@ -61,7 +65,7 @@ const UserSchema = new mongoose.Schema(
     myReviewCards: {
       type: [
         {
-          type: mongoose.Schema.Types.ObjectId,
+          type: mongoose.Schema.Types.Mixed,
           ref: "ReviewCard",
         },
       ],
