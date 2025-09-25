@@ -103,7 +103,7 @@ exports.startCourse = async (req, res) => {
   try {
     const [user, course] = await Promise.all([
       User.findById(req.user._id),
-      Course.findById(req.params.id),
+      Course.findById(req.body.id),
     ]);
 
     // error handling
@@ -153,7 +153,7 @@ exports.startCourseware = async (req, res) => {
   try {
     const [user, courseware] = await Promise.all([
       User.findById(req.user._id),
-      Courseware.findById(req.params.id),
+      Courseware.findById(req.body.id),
     ]);
 
     // error handling
