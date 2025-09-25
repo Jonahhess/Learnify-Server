@@ -41,6 +41,9 @@ const coursewareSchema = new mongoose.Schema(
     keywords: {
       type: [String],
     },
+    index: {
+      type: Number,
+    },
   },
   {
     timestamps: true,
