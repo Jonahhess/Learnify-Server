@@ -304,9 +304,11 @@ exports.submitCourseware = async (req, res) => {
 };
 
 // helper fn for review cards
-const performReview = async (reviewCard) => {
-  reviewCard.reviews += 1;
-  reviewCard.successes = req.body.success ? reviewCard.successes + 1 : 0;
+const performReview = async (reviewCard, success) => {
+  reviewCard.reviews = reviewCard.reviews ? reviewCard.reviews + 1 : 1;
+  reviewCard.successes = reviewCard.successes
+    ? reviewCard.successes + success
+    : success;
   const add = Math.min(Math.max(reviewCard.successes * 2, 1), 365);
   const oldReviewDate = new Date(reviewCard.nextReviewDate);
   const nextReviewDate = oldReviewDate.setDate(oldReviewDate.getDate() + add);
@@ -326,7 +328,7 @@ exports.batchSubmitReviewCards = async (req, res) => {
         .json({ message: "user not found. This is awkward" });
 
     const myReviewCards = user.myReviewCards;
-    const reviewedCards = req.body; // [{_id: '...', success: 1}, {_id: "...", success: 0}]
+    const { reviewedCards } = req.body; // [{_id: '...', success: 1}, {_id: "...", success: 0}]
 
     if (reviewedCards.length > myReviewCards.length) {
       return res
@@ -336,18 +338,24 @@ exports.batchSubmitReviewCards = async (req, res) => {
 
     // array of relevant cards
     const reviewCards = await ReviewCard.find({
-      _id: { $in: reviewedCards._id },
+      questionId: { $in: reviewedCards.map((c) => c.questionId) },
       userId: req.user._id,
-      nextReviewDate: { $lte: Date.now() },
     });
 
     for (const card of reviewCards) {
-      performReview(card);
+      performReview(
+        card,
+        !!reviewedCards.find(
+          (rc) => rc.questionId === card.questionId.toString()
+        )?.success
+      );
     }
 
-    user.myReviewCards = user.myReviewCards.filter(
-      (c) => !reviewedCards.includes(c)
+    const idsReviewed = reviewCards.map((rc) => rc.questionId.toString());
+    const reviewCardsExceptFinished = myReviewCards.filter(
+      (rc) => !idsReviewed.includes(rc.questionId.toString())
     );
+    user.myReviewCards = reviewCardsExceptFinished;
 
     await user.save();
 
