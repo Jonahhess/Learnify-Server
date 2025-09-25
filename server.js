@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const connectDB = require("./db");
 const logger = require("./middleware/logger");
@@ -13,6 +13,7 @@ const app = express();
 app.use(
   cors({
     origin: "https://learnify-77of.onrender.com",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -25,9 +26,11 @@ app.use(cookieParser());
 connectDB();
 
 // Use the API routes
-app.use('/', apiRoutes);
+app.use("/", apiRoutes);
 
 // Centralized error handler
 app.use(errorHandler);
 
-app.listen(process.env.PORT || 4000, () => console.log(`Server running on port ${process.env.PORT || 4000}`));
+app.listen(process.env.PORT || 4000, () =>
+  console.log(`Server running on port ${process.env.PORT || 4000}`)
+);

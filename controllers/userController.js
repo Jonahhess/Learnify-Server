@@ -103,7 +103,7 @@ exports.startCourse = async (req, res) => {
   try {
     const [user, course] = await Promise.all([
       User.findById(req.user._id),
-      Course.findById(req.params.id),
+      Course.findById(req.body.id),
     ]);
 
     // error handling
@@ -113,7 +113,7 @@ exports.startCourse = async (req, res) => {
         .status(500)
         .json({ message: "user not found. This is awkward" });
 
-    if (user.myCurrentCourses.some((c) => c.courseId === course._id)) {
+    if (user.myCurrentCourses.some((c) => c.courseId.equals(course._id))) {
       return res.status(400).json({ message: "course already exists!" });
     }
     if (user.myCurrentCourses.length >= 5) {
@@ -130,14 +130,18 @@ exports.startCourse = async (req, res) => {
     if (length) {
       const firstCourseware = course.coursewares[0];
       const coursewareTitle = firstCourseware.title;
-      const coursewareId = firstCourseware.coursewareId;
+      const coursewareId = firstCourseware._doc.coursewareId;
 
-      user.myCurrentCoursewares.push({
+      let entry = {
         courseId,
-        coursewareId,
         title: coursewareTitle,
         index: 0,
-      });
+      };
+
+      if (coursewareId) {
+        entry = { ...entry, coursewareId };
+      }
+      user.myCurrentCoursewares.push(entry);
     }
 
     await user.save();
@@ -153,7 +157,7 @@ exports.startCourseware = async (req, res) => {
   try {
     const [user, courseware] = await Promise.all([
       User.findById(req.user._id),
-      Courseware.findById(req.params.id),
+      Courseware.findById(req.body.id),
     ]);
 
     // error handling
@@ -165,7 +169,9 @@ exports.startCourseware = async (req, res) => {
         .json({ message: "user not found. This is awkward" });
 
     if (
-      user.myCurrentCoursewares.some((c) => c.coursewareId === courseware._id)
+      user.myCurrentCoursewares.some((c) =>
+        c.coursewareId.equals(courseware._id)
+      )
     ) {
       return res.status(400).json({ message: "courseware already exists!" });
     }
@@ -174,7 +180,7 @@ exports.startCourseware = async (req, res) => {
     }
 
     if (
-      !user.myCurrentCourses.some((c) => c.courseId === courseware.courseId)
+      !user.myCurrentCourses.some((c) => c.courseId.equals(courseware.courseId))
     ) {
       return res
         .status(400)
@@ -216,7 +222,7 @@ exports.submitCourseware = async (req, res) => {
   try {
     const [user, courseware] = await Promise.all([
       User.findById(req.user._id),
-      Courseware.findById(req.params.id),
+      Courseware.findById(req.params.coursewareId),
     ]);
 
     if (!user)
@@ -227,7 +233,9 @@ exports.submitCourseware = async (req, res) => {
       return res.status(404).json({ message: "Courseware not found" });
 
     if (
-      !user.myCurrentCoursewares.some((c) => c.coursewareId === req.params.id)
+      !user.myCurrentCoursewares.some(
+        (c) => c._doc.coursewareId.toString() === req.params.coursewareId
+      )
     ) {
       return res
         .status(400)
@@ -237,24 +245,30 @@ exports.submitCourseware = async (req, res) => {
     const courseId = courseware.courseId;
     const coursewareId = courseware._id;
     const title = courseware.title;
+    const index = courseware._doc.index;
 
     const quiz = courseware.quiz.map((q) => q.questionId);
-    const userId = req.user.id;
+    const userId = req.user._id;
     const now = new Date();
     const nextReviewDate = now.setDate(now.getDate() + 1);
 
     // move courseware from current to completed
-    user.myCurrentCoursewares = user.myCurrentCoursewares.filter(
-      (c) => c.coursewareId !== coursewareId
+
+    const coursewaresExceptCurrent = user.myCurrentCoursewares.filter(
+      (c) => !c.coursewareId.equals(coursewareId)
     );
-    user.myCompletedCoursewares.push({ courseId, coursewareId, title });
+
+    user.myCurrentCoursewares = coursewaresExceptCurrent;
+    user.myCompletedCoursewares.push({ courseId, coursewareId, title, index });
 
     // check if user finished the course - if so move course to completed
     const course = await Course.findById(courseId);
     const courseTitle = course.title;
     const length = course.coursewares?.length;
     const lengthCompletedCoursewaresOfCourse =
-      user.myCompletedCoursewares.filter((c) => c.courseId === courseId).length;
+      user.myCompletedCoursewares.filter((c) =>
+        c.courseId.equals(courseId)
+      ).length;
 
     if (length === lengthCompletedCoursewaresOfCourse) {
       // completed the course! congrats
@@ -262,6 +276,17 @@ exports.submitCourseware = async (req, res) => {
       user.myCurrentCourses = user.myCurrentCourses.filter(
         (c) => c.courseId !== courseId
       );
+    } else {
+      const nextIndex = index + 1;
+      const nextCourseware = course.coursewares[nextIndex];
+      const title = nextCourseware.title;
+      const coursewareId = nextCourseware.coursewareId;
+
+      let entry = { title, courseId, index: nextIndex };
+      if (coursewareId) {
+        entry = { ...entry, coursewareId };
+      }
+      user.myCurrentCoursewares.push(entry);
     }
 
     const promises = [user.save()];
@@ -287,9 +312,11 @@ exports.submitCourseware = async (req, res) => {
 };
 
 // helper fn for review cards
-const performReview = async (reviewCard) => {
-  reviewCard.reviews += 1;
-  reviewCard.successes = req.body.success ? reviewCard.successes + 1 : 0;
+const performReview = async (reviewCard, success) => {
+  reviewCard.reviews = reviewCard.reviews ? reviewCard.reviews + 1 : 1;
+  reviewCard.successes = reviewCard.successes
+    ? reviewCard.successes + success
+    : success;
   const add = Math.min(Math.max(reviewCard.successes * 2, 1), 365);
   const oldReviewDate = new Date(reviewCard.nextReviewDate);
   const nextReviewDate = oldReviewDate.setDate(oldReviewDate.getDate() + add);
@@ -309,7 +336,7 @@ exports.batchSubmitReviewCards = async (req, res) => {
         .json({ message: "user not found. This is awkward" });
 
     const myReviewCards = user.myReviewCards;
-    const reviewedCards = req.body; // [{_id: '...', success: 1}, {_id: "...", success: 0}]
+    const { reviewedCards } = req.body; // [{_id: '...', success: 1}, {_id: "...", success: 0}]
 
     if (reviewedCards.length > myReviewCards.length) {
       return res
@@ -319,18 +346,24 @@ exports.batchSubmitReviewCards = async (req, res) => {
 
     // array of relevant cards
     const reviewCards = await ReviewCard.find({
-      _id: { $in: reviewedCards._id },
+      questionId: { $in: reviewedCards.map((c) => c.questionId) },
       userId: req.user._id,
-      nextReviewDate: { $lte: Date.now() },
     });
 
     for (const card of reviewCards) {
-      performReview(card);
+      performReview(
+        card,
+        !!reviewedCards.find(
+          (rc) => rc.questionId === card.questionId.toString()
+        )?.success
+      );
     }
 
-    user.myReviewCards = user.myReviewCards.filter(
-      (c) => !reviewedCards.includes(c)
+    const idsReviewed = reviewCards.map((rc) => rc.questionId.toString());
+    const reviewCardsExceptFinished = myReviewCards.filter(
+      (rc) => !idsReviewed.includes(rc.questionId.toString())
     );
+    user.myReviewCards = reviewCardsExceptFinished;
 
     await user.save();
 
