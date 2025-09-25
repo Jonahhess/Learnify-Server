@@ -1,7 +1,4 @@
-const express = require("express");
-const app = express();
-
-app.use((req, res, next) => {
+function validateUser(req, res, next) {
   const userId = req.user._id;
   const paramId = req.param.id;
 
@@ -10,4 +7,6 @@ app.use((req, res, next) => {
     return;
   }
   next();
-});
+}
+
+module.exports = validateUser;
