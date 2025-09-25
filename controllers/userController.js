@@ -113,7 +113,7 @@ exports.startCourse = async (req, res) => {
         .status(500)
         .json({ message: "user not found. This is awkward" });
 
-    if (user.myCurrentCourses.some((c) => c.courseId === course._id)) {
+    if (user.myCurrentCourses.some((c) => c.courseId.equals(course._id))) {
       return res.status(400).json({ message: "course already exists!" });
     }
     if (user.myCurrentCourses.length >= 5) {
