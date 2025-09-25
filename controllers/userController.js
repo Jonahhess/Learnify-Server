@@ -277,8 +277,16 @@ exports.submitCourseware = async (req, res) => {
         (c) => c.courseId !== courseId
       );
     } else {
-      const nextCourseware = course.coursewares[index + 1];
-      user.myCurrentCoursewares.push({ ...nextCourseware, courseId });
+      const nextIndex = index + 1;
+      const nextCourseware = course.coursewares[nextIndex];
+      const title = nextCourseware.title;
+      const coursewareId = nextCourseware.coursewareId;
+
+      let entry = { title, courseId, index: nextIndex };
+      if (coursewareId) {
+        entry = { ...entry, coursewareId };
+      }
+      user.myCurrentCoursewares.push(entry);
     }
 
     const promises = [user.save()];
