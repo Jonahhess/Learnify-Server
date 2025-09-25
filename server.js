@@ -13,7 +13,6 @@ const app = express();
 app.use(
   cors({
     origin: "https://learnify-77of.onrender.com",
-    origin: "http://localhost:5173",
     credentials: true,
   })
 );
