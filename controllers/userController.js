@@ -276,6 +276,9 @@ exports.submitCourseware = async (req, res) => {
       user.myCurrentCourses = user.myCurrentCourses.filter(
         (c) => c.courseId !== courseId
       );
+    } else {
+      const nextCourseware = course.coursewares[index + 1];
+      user.myCurrentCoursewares.push({ ...nextCourseware, courseId });
     }
 
     const promises = [user.save()];
