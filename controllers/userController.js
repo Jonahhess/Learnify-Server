@@ -130,14 +130,18 @@ exports.startCourse = async (req, res) => {
     if (length) {
       const firstCourseware = course.coursewares[0];
       const coursewareTitle = firstCourseware.title;
-      const coursewareId = firstCourseware._id;
+      const coursewareId = firstCourseware._doc.coursewareId;
 
-      user.myCurrentCoursewares.push({
+      let entry = {
         courseId,
-        coursewareId,
         title: coursewareTitle,
         index: 0,
-      });
+      };
+
+      if (coursewareId) {
+        entry = { ...entry, coursewareId };
+      }
+      user.myCurrentCoursewares.push(entry);
     }
 
     await user.save();
