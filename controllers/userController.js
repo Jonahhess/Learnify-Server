@@ -245,6 +245,7 @@ exports.submitCourseware = async (req, res) => {
     const courseId = courseware.courseId;
     const coursewareId = courseware._id;
     const title = courseware.title;
+    const index = courseware._doc.index;
 
     const quiz = courseware.quiz.map((q) => q.questionId);
     const userId = req.user._id;
@@ -252,17 +253,22 @@ exports.submitCourseware = async (req, res) => {
     const nextReviewDate = now.setDate(now.getDate() + 1);
 
     // move courseware from current to completed
-    user.myCurrentCoursewares = user.myCurrentCoursewares.filter(
-      (c) => c.coursewareId !== coursewareId
+
+    const coursewaresExceptCurrent = user.myCurrentCoursewares.filter(
+      (c) => !c.coursewareId.equals(coursewareId)
     );
-    user.myCompletedCoursewares.push({ courseId, coursewareId, title });
+
+    user.myCurrentCoursewares = coursewaresExceptCurrent;
+    user.myCompletedCoursewares.push({ courseId, coursewareId, title, index });
 
     // check if user finished the course - if so move course to completed
     const course = await Course.findById(courseId);
     const courseTitle = course.title;
     const length = course.coursewares?.length;
     const lengthCompletedCoursewaresOfCourse =
-      user.myCompletedCoursewares.filter((c) => c.courseId === courseId).length;
+      user.myCompletedCoursewares.filter((c) =>
+        c.courseId.equals(courseId)
+      ).length;
 
     if (length === lengthCompletedCoursewaresOfCourse) {
       // completed the course! congrats
