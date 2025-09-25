@@ -42,9 +42,13 @@ exports.generateCourseware = async (req, res) => {
       throw { message: "course not found" };
     }
 
+    const index = courseToUpdate.coursewares.findIndex(
+      (cw) => cw.title === title
+    );
+
     const courseware = await generateCoursewareFromTitle(courseTitle, title);
 
-    const toJson = JSON.parse(JSON.stringify(courseware));
+    const toJson = JSON.parse(courseware);
     const { text, quiz } = toJson;
 
     const coursewareId = new mongoose.Types.ObjectId();
@@ -73,17 +77,14 @@ exports.generateCourseware = async (req, res) => {
       text,
       quiz: quizFiltered,
       courseId: new mongoose.Types.ObjectId(courseId),
+      index,
     });
-
-    const index = courseToUpdate.coursewares.findIndex(
-      (o) => o.title === title
-    );
 
     if (index < 0 || index > courseToUpdate.coursewares.length) {
       throw { message: "impossible! index out of bounds!" };
     }
 
-    courseToUpdate.coursewares[index] = { title, coursewareId };
+    courseToUpdate.coursewares[index]._doc.coursewareId = coursewareId;
     await courseToUpdate.save();
 
     res.json(newCourseware);
