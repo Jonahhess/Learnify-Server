@@ -169,7 +169,9 @@ exports.startCourseware = async (req, res) => {
         .json({ message: "user not found. This is awkward" });
 
     if (
-      user.myCurrentCoursewares.some((c) => c.coursewareId === courseware._id)
+      user.myCurrentCoursewares.some((c) =>
+        c.coursewareId.equals(courseware._id)
+      )
     ) {
       return res.status(400).json({ message: "courseware already exists!" });
     }
@@ -178,7 +180,7 @@ exports.startCourseware = async (req, res) => {
     }
 
     if (
-      !user.myCurrentCourses.some((c) => c.courseId === courseware.courseId)
+      !user.myCurrentCourses.some((c) => c.courseId.equals(courseware.courseId))
     ) {
       return res
         .status(400)
@@ -220,7 +222,7 @@ exports.submitCourseware = async (req, res) => {
   try {
     const [user, courseware] = await Promise.all([
       User.findById(req.user._id),
-      Courseware.findById(req.params.id),
+      Courseware.findById(req.params.coursewareId),
     ]);
 
     if (!user)
@@ -231,7 +233,9 @@ exports.submitCourseware = async (req, res) => {
       return res.status(404).json({ message: "Courseware not found" });
 
     if (
-      !user.myCurrentCoursewares.some((c) => c.coursewareId === req.params.id)
+      !user.myCurrentCoursewares.some(
+        (c) => c._doc.coursewareId.toString() === req.params.coursewareId
+      )
     ) {
       return res
         .status(400)
@@ -243,7 +247,7 @@ exports.submitCourseware = async (req, res) => {
     const title = courseware.title;
 
     const quiz = courseware.quiz.map((q) => q.questionId);
-    const userId = req.user.id;
+    const userId = req.user._id;
     const now = new Date();
     const nextReviewDate = now.setDate(now.getDate() + 1);
 
