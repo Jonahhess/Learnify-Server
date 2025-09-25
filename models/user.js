@@ -56,6 +56,8 @@ const UserSchema = new mongoose.Schema(
             ref: "Courseware",
           },
           title: String,
+          courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course" },
+          index: Number,
         },
       ],
       default: [],
