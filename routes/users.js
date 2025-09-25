@@ -23,16 +23,16 @@ router.post("/login", loginUser);
 // interacting with the app
 
 // Add Course to user by Id
-router.post("/course/:id", auth, startCourse);
+router.post("/:id/courses", auth, startCourse);
 
 // Submit Courseware by id
-router.post("/coursewares/:id/submit", auth, submitCourseware);
+router.put("/:id/coursewares/:coursewareId", auth, submitCourseware);
 
 // Start Courseware by Id
-router.post("/coursewares/:id", auth, startCourseware);
+router.post("/:id/coursewares", auth, startCourseware);
 
 // Submit Review Cards
-router.post("/review", auth, batchSubmitReviewCards);
+router.post("/:id/reviewcards", auth, batchSubmitReviewCards);
 
 // end of app section
 
