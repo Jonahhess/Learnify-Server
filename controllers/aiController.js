@@ -7,6 +7,8 @@ const {
 const Course = require("../models/courses");
 const Courseware = require("../models/coursewares");
 const Question = require("../models/questions");
+const User = require("../models/users");
+
 const { default: mongoose } = require("mongoose");
 
 exports.generateCourseOutline = async (req, res) => {
@@ -73,6 +75,7 @@ exports.generateCourseware = async (req, res) => {
       });
 
     const newCourseware = await Courseware.create({
+      _id: coursewareId,
       title,
       text,
       quiz: quizFiltered,
@@ -91,6 +94,25 @@ exports.generateCourseware = async (req, res) => {
     await courseToUpdate.save();
 
     // TODO update user that current courseware should now have link to coursewareId (like above)
+    await User.updateMany(
+      {
+        "myCurrentCoursewares.courseId": newCourseware.courseId,
+        "myCurrentCoursewares.title": newCourseware.title,
+      },
+      {
+        $set: {
+          "myCurrentCoursewares.$[elem].coursewareId": newCourseware._id,
+        },
+      },
+      {
+        arrayFilters: [
+          {
+            "elem.courseId": newCourseware.courseId,
+            "elem.title": newCourseware.title,
+          },
+        ],
+      }
+    );
 
     res.json(newCourseware);
   } catch (err) {
