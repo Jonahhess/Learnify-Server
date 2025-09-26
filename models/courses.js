@@ -8,7 +8,7 @@ const courseSchema = new mongoose.Schema(
     },
     coursewares: [
       {
-        courswareId: {
+        coursewareId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Courseware",
         },
