@@ -90,6 +90,8 @@ exports.generateCourseware = async (req, res) => {
     });
     await courseToUpdate.save();
 
+    // TODO update user that current courseware should now have link to coursewareId (like above)
+
     res.json(newCourseware);
   } catch (err) {
     res.status(500).json({ message: err.message });
