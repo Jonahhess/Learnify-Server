@@ -5,11 +5,12 @@ const {
   generateCourseware,
   generateFullCourse,
 } = require("../controllers/aiController");
+const auth = require("../middleware/auth");
 
-router.post("/outline", generateCourseOutline);
+router.post("/outline", auth, generateCourseOutline);
 
-router.post("/courseware", generateCourseware);
+router.post("/courseware", auth, generateCourseware);
 
-router.post("/full-course", generateFullCourse);
+router.post("/full-course", auth, generateFullCourse);
 
 module.exports = router;
