@@ -315,8 +315,8 @@ exports.submitCourseware = async (req, res) => {
 const performReview = async (reviewCard, success) => {
   reviewCard.reviews = reviewCard.reviews ? reviewCard.reviews + 1 : 1;
   reviewCard.successes = reviewCard.successes
-    ? reviewCard.successes + success
-    : success;
+    ? reviewCard.successes + !!success
+    : !!success;
   const add = Math.min(Math.max(reviewCard.successes * 2, 1), 365);
   const oldReviewDate = new Date(reviewCard.nextReviewDate);
   const nextReviewDate = oldReviewDate.setDate(oldReviewDate.getDate() + add);
