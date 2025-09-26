@@ -84,7 +84,10 @@ exports.generateCourseware = async (req, res) => {
       throw { message: "impossible! index out of bounds!" };
     }
 
-    courseToUpdate.coursewares[index]._doc.coursewareId = coursewareId;
+    courseToUpdate.coursewares.splice(index, 1, {
+      ...courseToUpdate.coursewares[index],
+      coursewareId,
+    });
     await courseToUpdate.save();
 
     res.json(newCourseware);
