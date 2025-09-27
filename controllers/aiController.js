@@ -29,12 +29,10 @@ exports.generateCourseOutline = async (req, res) => {
       coursewares[0].title
     );
 
-    newCourse.coursewares[0] = {
-      ...newCourse.coursewares[0],
-      title: coursewares[0].title,
-      coursewareId: newCourseware._id,
-    };
-
+    newCourse.updateOne(
+      { "coursewares.id": 0 },
+      { $set: { "coursewares.$.coursewareId": newCourseware._id } }
+    );
     await newCourse.save();
 
     res.json(newCourse);
