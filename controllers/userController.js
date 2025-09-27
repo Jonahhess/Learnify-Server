@@ -328,7 +328,7 @@ const performReview = async (reviewCard, success) => {
 };
 
 // batch review cards by ID
-exports.batchSubmitReviewCards = async (req, res) => {
+exports.batchSubmitReviewCards2 = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -373,6 +373,77 @@ exports.batchSubmitReviewCards = async (req, res) => {
 
     res.send("reviewed cards successfully");
   } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+exports.batchSubmitReviewCards = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res
+        .status(500)
+        .json({ message: "user not found. This is awkward" });
+    }
+
+    const myReviewCards = user.myReviewCards;
+    const { reviewedCards } = req.body; // [{ _id: '...', success: 1/0 }]
+
+    if (reviewedCards.length > myReviewCards.length) {
+      return res
+        .status(400)
+        .json({ message: "too many cards reviewed. something is wrong" });
+    }
+
+    // find relevant cards
+    const reviewCards = await ReviewCard.find({
+      _id: { $in: reviewedCards.map((c) => c._id) },
+      userId: req.user._id,
+    });
+
+    // build bulk update operations
+    const ops = reviewCards
+      .map((card) => {
+        const match = reviewedCards.find(
+          (rc) => rc._id === card._id.toString()
+        );
+        if (!match) return null;
+
+        // let performReview calculate updated values
+        const updated = performReview(card, !!match.success);
+
+        return {
+          updateOne: {
+            filter: { _id: card._id },
+            update: {
+              $set: {
+                reviews: updated.reviews,
+                successes: updated.successes,
+                nextReviewDate: updated.nextReviewDate,
+                updatedAt: new Date(),
+              },
+            },
+          },
+        };
+      })
+      .filter(Boolean);
+
+    if (ops.length) {
+      await ReviewCard.bulkWrite(ops);
+    }
+
+    // remove reviewed cards from user.myReviewCards
+    const idsReviewed = reviewedCards.map((rc) => rc._id.toString());
+    user.myReviewCards = myReviewCards.filter(
+      (rc) => !idsReviewed.includes(rc._id.toString())
+    );
+
+    await user.save();
+
+    res.send("reviewed cards successfully");
+  } catch (err) {
+    console.error("Batch review error:", err);
     res.status(400).json({ message: err.message });
   }
 };
