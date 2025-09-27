@@ -2,6 +2,7 @@ const User = require("../models/users");
 const Course = require("../models/courses");
 const Courseware = require("../models/coursewares");
 const ReviewCard = require("../models/reviewCards");
+const { doGenerateCourseware } = require("./aiController");
 
 const jwt = require("jsonwebtoken");
 
@@ -130,22 +131,20 @@ exports.startCourse = async (req, res) => {
     if (length) {
       const firstCourseware = course.coursewares[0];
       const coursewareTitle = firstCourseware.title;
-      const coursewareId = firstCourseware._doc.coursewareId;
 
-      let entry = {
+      const entry = {
         courseId,
         title: coursewareTitle,
         index: 0,
+        coursewareId:
+          firstCourseware._doc.coursewareId ||
+          (await doGenerateCourseware(title, courseId, coursewareTitle)._id),
       };
 
-      if (coursewareId) {
-        entry = { ...entry, coursewareId };
-      }
       user.myCurrentCoursewares.push(entry);
     }
 
     await user.save();
-
     res.send("added course successfully");
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -234,7 +233,7 @@ exports.submitCourseware = async (req, res) => {
 
     if (
       !user.myCurrentCoursewares.some(
-        (c) => c._doc.coursewareId.toString() === req.params.coursewareId
+        (c) => c._doc.coursewareId?.toString() === req.params.coursewareId
       )
     ) {
       return res
@@ -247,15 +246,10 @@ exports.submitCourseware = async (req, res) => {
     const title = courseware.title;
     const index = courseware._doc.index;
 
-    const quiz = courseware.quiz.map((q) => q.questionId);
-    const userId = req.user._id;
-    const now = new Date();
-    const nextReviewDate = now.setDate(now.getDate() + 1);
-
     // move courseware from current to completed
 
     const coursewaresExceptCurrent = user.myCurrentCoursewares.filter(
-      (c) => !c.coursewareId.equals(coursewareId)
+      (c) => !c.coursewareId?.equals(coursewareId)
     );
 
     user.myCurrentCoursewares = coursewaresExceptCurrent;
@@ -280,14 +274,23 @@ exports.submitCourseware = async (req, res) => {
       const nextIndex = index + 1;
       const nextCourseware = course.coursewares[nextIndex];
       const title = nextCourseware.title;
-      const coursewareId = nextCourseware.coursewareId;
 
-      let entry = { title, courseId, index: nextIndex };
-      if (coursewareId) {
-        entry = { ...entry, coursewareId };
-      }
+      const entry = {
+        title,
+        courseId,
+        index: nextIndex,
+        coursewareId:
+          nextCourseware.coursewareId ||
+          (await doGenerateCourseware(courseTitle, courseId, title)._id),
+      };
+
       user.myCurrentCoursewares.push(entry);
     }
+
+    const quiz = courseware.quiz.map((q) => q.questionId);
+    const userId = req.user._id;
+    const now = new Date();
+    const nextReviewDate = now.setDate(now.getDate() + 1);
 
     const promises = [user.save()];
     for (const questionId of quiz) {
@@ -335,8 +338,10 @@ exports.batchSubmitReviewCards = async (req, res) => {
         .status(500)
         .json({ message: "user not found. This is awkward" });
 
+    // {reviewedCards: [{questionId, success: 0}, {questionId, success: 1}]}
+
     const myReviewCards = user.myReviewCards;
-    const { reviewedCards } = req.body; // [{_id: '...', success: 1}, {_id: "...", success: 0}]
+    const { reviewedCards } = req.body; // [{questionId: '...', success: 1}, {_id: "...", success: 0}]
 
     if (reviewedCards.length > myReviewCards.length) {
       return res
@@ -353,9 +358,8 @@ exports.batchSubmitReviewCards = async (req, res) => {
     for (const card of reviewCards) {
       performReview(
         card,
-        !!reviewedCards.find(
-          (rc) => rc.questionId === card.questionId.toString()
-        )?.success
+        !!reviewedCards.find((rc) => rc.questionId === card._id.toString())
+          ?.success
       );
     }
 
