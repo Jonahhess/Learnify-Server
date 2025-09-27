@@ -2,6 +2,7 @@ const User = require("../models/users");
 const Course = require("../models/courses");
 const Courseware = require("../models/coursewares");
 const ReviewCard = require("../models/reviewCards");
+const { doGenerateCourseware } = require("./aiController");
 
 const jwt = require("jsonwebtoken");
 
@@ -130,22 +131,20 @@ exports.startCourse = async (req, res) => {
     if (length) {
       const firstCourseware = course.coursewares[0];
       const coursewareTitle = firstCourseware.title;
-      const coursewareId = firstCourseware._doc.coursewareId;
 
-      let entry = {
+      const entry = {
         courseId,
         title: coursewareTitle,
         index: 0,
+        coursewareId:
+          firstCourseware._doc.coursewareId ||
+          (await doGenerateCourseware(title, courseId, coursewareTitle)._id),
       };
 
-      if (coursewareId) {
-        entry = { ...entry, coursewareId };
-      }
       user.myCurrentCoursewares.push(entry);
     }
 
     await user.save();
-
     res.send("added course successfully");
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -234,7 +233,7 @@ exports.submitCourseware = async (req, res) => {
 
     if (
       !user.myCurrentCoursewares.some(
-        (c) => c._doc.coursewareId.toString() === req.params.coursewareId
+        (c) => c._doc.coursewareId?.toString() === req.params.coursewareId
       )
     ) {
       return res
@@ -247,15 +246,10 @@ exports.submitCourseware = async (req, res) => {
     const title = courseware.title;
     const index = courseware._doc.index;
 
-    const quiz = courseware.quiz.map((q) => q.questionId);
-    const userId = req.user._id;
-    const now = new Date();
-    const nextReviewDate = now.setDate(now.getDate() + 1);
-
     // move courseware from current to completed
 
     const coursewaresExceptCurrent = user.myCurrentCoursewares.filter(
-      (c) => !c.coursewareId.equals(coursewareId)
+      (c) => !c.coursewareId?.equals(coursewareId)
     );
 
     user.myCurrentCoursewares = coursewaresExceptCurrent;
@@ -280,14 +274,23 @@ exports.submitCourseware = async (req, res) => {
       const nextIndex = index + 1;
       const nextCourseware = course.coursewares[nextIndex];
       const title = nextCourseware.title;
-      const coursewareId = nextCourseware.coursewareId;
 
-      let entry = { title, courseId, index: nextIndex };
-      if (coursewareId) {
-        entry = { ...entry, coursewareId };
-      }
+      const entry = {
+        title,
+        courseId,
+        index: nextIndex,
+        coursewareId:
+          nextCourseware.coursewareId ||
+          (await doGenerateCourseware(courseTitle, courseId, title)._id),
+      };
+
       user.myCurrentCoursewares.push(entry);
     }
+
+    const quiz = courseware.quiz.map((q) => q.questionId);
+    const userId = req.user._id;
+    const now = new Date();
+    const nextReviewDate = now.setDate(now.getDate() + 1);
 
     const promises = [user.save()];
     for (const questionId of quiz) {
@@ -315,8 +318,8 @@ exports.submitCourseware = async (req, res) => {
 const performReview = async (reviewCard, success) => {
   reviewCard.reviews = reviewCard.reviews ? reviewCard.reviews + 1 : 1;
   reviewCard.successes = reviewCard.successes
-    ? reviewCard.successes + success
-    : success;
+    ? reviewCard.successes + !!success
+    : !!success;
   const add = Math.min(Math.max(reviewCard.successes * 2, 1), 365);
   const oldReviewDate = new Date(reviewCard.nextReviewDate);
   const nextReviewDate = oldReviewDate.setDate(oldReviewDate.getDate() + add);
@@ -325,7 +328,7 @@ const performReview = async (reviewCard, success) => {
 };
 
 // batch review cards by ID
-exports.batchSubmitReviewCards = async (req, res) => {
+exports.batchSubmitReviewCards2 = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
@@ -335,8 +338,10 @@ exports.batchSubmitReviewCards = async (req, res) => {
         .status(500)
         .json({ message: "user not found. This is awkward" });
 
+    // {reviewedCards: [{questionId, success: 0}, {questionId, success: 1}]}
+
     const myReviewCards = user.myReviewCards;
-    const { reviewedCards } = req.body; // [{_id: '...', success: 1}, {_id: "...", success: 0}]
+    const { reviewedCards } = req.body; // [{questionId: '...', success: 1}, {_id: "...", success: 0}]
 
     if (reviewedCards.length > myReviewCards.length) {
       return res
@@ -353,9 +358,8 @@ exports.batchSubmitReviewCards = async (req, res) => {
     for (const card of reviewCards) {
       performReview(
         card,
-        !!reviewedCards.find(
-          (rc) => rc.questionId === card.questionId.toString()
-        )?.success
+        !!reviewedCards.find((rc) => rc.questionId === card._id.toString())
+          ?.success
       );
     }
 
@@ -369,6 +373,77 @@ exports.batchSubmitReviewCards = async (req, res) => {
 
     res.send("reviewed cards successfully");
   } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+exports.batchSubmitReviewCards = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res
+        .status(500)
+        .json({ message: "user not found. This is awkward" });
+    }
+
+    const myReviewCards = user.myReviewCards;
+    const { reviewedCards } = req.body; // [{ _id: '...', success: 1/0 }]
+
+    if (reviewedCards.length > myReviewCards.length) {
+      return res
+        .status(400)
+        .json({ message: "too many cards reviewed. something is wrong" });
+    }
+
+    // find relevant cards
+    const reviewCards = await ReviewCard.find({
+      _id: { $in: reviewedCards.map((c) => c._id) },
+      userId: req.user._id,
+    });
+
+    // build bulk update operations
+    const ops = reviewCards
+      .map((card) => {
+        const match = reviewedCards.find(
+          (rc) => rc._id === card._id.toString()
+        );
+        if (!match) return null;
+
+        // let performReview calculate updated values
+        const updated = performReview(card, !!match.success);
+
+        return {
+          updateOne: {
+            filter: { _id: card._id },
+            update: {
+              $set: {
+                reviews: updated.reviews,
+                successes: updated.successes,
+                nextReviewDate: updated.nextReviewDate,
+                updatedAt: new Date(),
+              },
+            },
+          },
+        };
+      })
+      .filter(Boolean);
+
+    if (ops.length) {
+      await ReviewCard.bulkWrite(ops);
+    }
+
+    // remove reviewed cards from user.myReviewCards
+    const idsReviewed = reviewedCards.map((rc) => rc._id.toString());
+    user.myReviewCards = myReviewCards.filter(
+      (rc) => !idsReviewed.includes(rc._id.toString())
+    );
+
+    await user.save();
+
+    res.send("reviewed cards successfully");
+  } catch (err) {
+    console.error("Batch review error:", err);
     res.status(400).json({ message: err.message });
   }
 };
