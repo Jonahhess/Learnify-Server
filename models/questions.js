@@ -19,6 +19,12 @@ const questionSchema = new mongoose.Schema(
       type: [String],
       required: true,
     },
+    answerStartIndex: {
+      type: Number,
+    },
+    answerEndIndex: {
+      type: Number,
+    },
     likes: {
       type: Number,
       default: 0,
