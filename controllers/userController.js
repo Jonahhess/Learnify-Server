@@ -312,7 +312,15 @@ exports.submitCourseware = async (req, res) => {
     }
 
     await Promise.all(promises);
-        
+
+    let correctFlag = false;
+    for (let i = 0; i < 20; i++) {
+      const testUser = await User.findById(req.user._id);
+      correctFlag = testUser.myCurrentCourses.some((c) =>
+        c.coursewareId?.equals(entry.coursewareId)
+      );
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }    
     res.send("submitted courseware successfully");
   } catch (err) {
     res.status(400).json({ message: err.message });
