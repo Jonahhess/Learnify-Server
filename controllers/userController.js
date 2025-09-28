@@ -284,9 +284,9 @@ exports.submitCourseware = async (req, res) => {
           (await doGenerateCourseware(courseTitle, courseId, title)._id),
       };
       
-      if (!entry.coursewareId) {
-        throw {message: "failed to create new courseware"}
-        }
+      // if (!entry.coursewareId) {
+      //   throw {message: "failed to create new courseware"}
+      //   }
 
       user.myCurrentCoursewares.push(entry);
     }
