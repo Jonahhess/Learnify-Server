@@ -21,7 +21,7 @@ exports.createUser = async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: true, // Use secure cookies in production
-        sameSite: "none",
+        sameSite: "None",
         maxAge: 3600000, // 1 hour
       })
       .status(201)
@@ -53,7 +53,7 @@ exports.loginUser = async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: true, // Use secure cookies in production
-        sameSite: "none",
+        sameSite: "None",
         maxAge: 3600000, // 1 hour
       })
       .json({ message: "Logged in successfully", user: user.toObject() });
