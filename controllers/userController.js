@@ -314,12 +314,17 @@ exports.submitCourseware = async (req, res) => {
     await Promise.all(promises);
     
     let correctFlag = false;
-for (let i = 0; !correctFlag && i < 20; i++) {
-    const testUser = await User.findById(req.user._id);
-correctFlag = testUser.myCurrentCourses.some((c) => c.coursewareId.equals(entry.coursewareId));
-
-  await new Promise(resolve => setTimeout(resolve, 1000)); 
-}
+    for (let i = 0; i < 20; i++) {
+      const testUser = await User.findById(req.user._id);
+      const found = testUser.myCurrentCoursewares.some(
+        (c) => String(c.coursewareId) === String(entry.coursewareId)
+      );
+      if (found) {
+        correctFlag = true;
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 5000));
+    }
     
     res.send("submitted courseware successfully");
   } catch (err) {
